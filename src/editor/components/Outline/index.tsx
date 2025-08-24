@@ -1,4 +1,3 @@
-import React from 'react'
 import { useComponentsStore } from '../../stores/components'
 import { DownOutlined } from '@ant-design/icons';
 import { Tree } from 'antd';

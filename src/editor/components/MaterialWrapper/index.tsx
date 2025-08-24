@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Segmented } from 'antd';
 import Material from '../Materail'
 import Outline from '../Outline'

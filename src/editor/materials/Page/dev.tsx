@@ -5,7 +5,7 @@ import type { CommonComponentProps } from '../../interface'
 // import { useComponentConfigStore } from '../../stores/component-config'
 import { useMaterialDrop } from '../../hooks/useMaterialDrop'
 
-export default function Page({id, name, children, styles}: CommonComponentProps) {
+export default function Page({id, children, styles}: CommonComponentProps) {
 
   // const [messageApi, contextHolder] = message.useMessage();
   // const { addComponent } = useComponentsStore()

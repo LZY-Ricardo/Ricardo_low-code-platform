@@ -6,7 +6,7 @@ import type { ComponentSetter } from '../../stores/component-config';
 
 export default function ComponentAttr() {
   const [form] = Form.useForm();
-  const { curComponentId, curComponent, updateComponentProps } = useComponentsStore()
+  const { curComponentId, curComponent } = useComponentsStore()
   const { componentConfig } = useComponentConfigStore()
 
   // 回显

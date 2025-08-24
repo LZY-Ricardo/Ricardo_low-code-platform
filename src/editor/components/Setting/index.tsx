@@ -1,12 +1,10 @@
 import { useState } from 'react'
-import { useComponentsStore } from '../../stores/components'
 import { Segmented } from 'antd';
 import ComponentAttr from './ComponentAttr'
 import ComponentStyle from './ComponentStyle'
 import ComponentEvent from './ComponentEvent'
 
 export default function Setting() {
-  const { components } = useComponentsStore()
   const [key, setKey] = useState('属性')
   
   return (
