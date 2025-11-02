@@ -24,7 +24,7 @@ function extractImageUrl(url: string): string {
     }
 }
 
-export default function Image({ src, alt, width, height, styles }: CommonComponentProps) {
+export default function Image({ src, alt, width, height, styles, onClick, onDoubleClick, onMouseEnter, onMouseLeave, ...rest }: CommonComponentProps) {
     // 处理空值
     const rawSrc = (src === undefined || src === null || src === '')
         ? 'https://via.placeholder.com/300x200'
@@ -40,7 +40,12 @@ export default function Image({ src, alt, width, height, styles }: CommonCompone
             width={width || 200}
             height={height || 200}
             style={styles}
+            onClick={onClick}
+            onDoubleClick={onDoubleClick}
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
             fallback="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect fill='%23f0f0f0' width='200' height='200'/%3E%3Ctext fill='%23999' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3E图片加载失败%3C/text%3E%3C/svg%3E"
+            {...rest}
         />
     )
 }

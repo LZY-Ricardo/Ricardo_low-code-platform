@@ -1,11 +1,15 @@
 import { create } from 'zustand'
 import type { CSSProperties } from 'react'
+import type { ComponentEvent } from '../types/event'
 
 export interface Component {
     id: number,
     name: string,
     props: any,
     styles?: CSSProperties,
+    events?: {
+        [eventType: string]: ComponentEvent
+    },
     desc: string,
     children?: Component[],
     parentId?: number
@@ -22,6 +26,7 @@ export interface Action {
     updateComponentProps: (componentId: number, props: any) => void;  // 更新组件属性
     setCurComponentId: (componentId: number) => void;
     updateComponentStyles: (componentId: number, styles: CSSProperties) => void;
+    updateComponentEvents: (componentId: number, events: Record<string, ComponentEvent>) => void;  // 更新组件事件
     setMode: (mode: 'edit' | 'preview') => void;
 }
 
@@ -105,6 +110,46 @@ export const useComponentsStore = create<State & Action>(
                 if (component) {
                     component.styles = { ...component.styles, ...styles }
                     // 如果更新的是当前选中的组件，同步更新 curComponent
+                    const updatedComponent = state.curComponentId === componentId
+                        ? getComponentById(componentId, [...state.components])
+                        : state.curComponent
+                    return {
+                        components: [...state.components],
+                        curComponent: updatedComponent
+                    }
+                }
+                return {
+                    components: [...state.components]
+                }
+            })
+        },
+        /**
+         * 更新组件事件配置
+         * 
+         * 更新指定组件的事件配置
+         * 如果更新的是当前选中的组件，会同步更新 curComponent
+         * 
+         * @param componentId - 组件 ID
+         * @param events - 要更新的事件配置对象（格式：{ eventType: ComponentEvent }）
+         * 
+         * @example
+         * updateComponentEvents(123, {
+         *   onClick: {
+         *     eventType: 'onClick',
+         *     actionType: 'showMessage',
+         *     actionConfig: { type: 'success', content: '点击成功' }
+         *   }
+         * })
+         */
+        updateComponentEvents: (componentId, events) => {
+            set(state => {
+                const component = getComponentById(componentId, state.components)
+                if (component) {
+                    // 合并事件配置（新配置会覆盖旧配置）
+                    component.events = { ...component.events, ...events }
+
+                    // 如果更新的是当前选中的组件，同步更新 curComponent
+                    // 这样属性面板中的事件配置会立即更新
                     const updatedComponent = state.curComponentId === componentId
                         ? getComponentById(componentId, [...state.components])
                         : state.curComponent
