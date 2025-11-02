@@ -96,7 +96,55 @@ export default function SelectedMask({ containerClassName, portalWrapperClassNam
 
     useEffect(() => {
         updatePosition()
-    }, [componentId, portalElement, updatePosition])
+    }, [componentId, portalElement, updatePosition, components])
+
+    // 使用 ResizeObserver 监听组件尺寸变化和容器尺寸变化
+    useEffect(() => {
+        if (!componentId) {
+            return
+        }
+
+        let componentResizeObserver: ResizeObserver | null = null
+        let containerResizeObserver: ResizeObserver | null = null
+
+        // 使用 requestAnimationFrame 确保在 DOM 更新后再查找元素
+        const rafId = requestAnimationFrame(() => {
+            const node = document.querySelector(`[data-component-id="${componentId}"]`)
+            const container = document.querySelector(`.${containerClassName}`)
+
+            if (!node || !container) {
+                return
+            }
+
+            // 创建 ResizeObserver 来监听组件尺寸变化
+            componentResizeObserver = new ResizeObserver(() => {
+                // 当组件尺寸改变时，重新计算位置
+                updatePosition()
+            })
+
+            // 创建 ResizeObserver 来监听容器尺寸变化
+            containerResizeObserver = new ResizeObserver(() => {
+                // 当容器尺寸改变时（如拖拽右侧面板），重新计算位置
+                updatePosition()
+            })
+
+            // 开始观察组件元素
+            componentResizeObserver.observe(node)
+            // 开始观察容器元素
+            containerResizeObserver.observe(container as Element)
+        })
+
+        // 清理函数：停止观察和取消动画帧
+        return () => {
+            cancelAnimationFrame(rafId)
+            if (componentResizeObserver) {
+                componentResizeObserver.disconnect()
+            }
+            if (containerResizeObserver) {
+                containerResizeObserver.disconnect()
+            }
+        }
+    }, [componentId, updatePosition, components, containerClassName])
 
     useEffect(() => {
         const resizeHandler = () => {
