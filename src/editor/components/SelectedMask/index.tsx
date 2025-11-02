@@ -22,7 +22,7 @@ export default function SelectedMask({ containerClassName, portalWrapperClassNam
 
     const [portalElement, setPortalElement] = useState<HTMLElement | null>(null)
 
-    const { components, curComponentId, deleteComponent, setCurComponentId } = useComponentsStore()
+    const { components, deleteComponent, setCurComponentId } = useComponentsStore()
 
     // 使用 useCallback 定义 updatePosition，避免依赖问题
     const updatePosition = useCallback(() => {
@@ -183,10 +183,12 @@ export default function SelectedMask({ containerClassName, portalWrapperClassNam
         return getComponentById(componentId, components)
     }, [componentId, components])
 
-    const handleDelete = () => {
+    const handleDelete = (e?: React.MouseEvent) => {
+        // 阻止事件冒泡，避免触发 EditArea 的点击事件
+        e?.stopPropagation()
         // 移除该组件（本质上就是将仓库中的json 数据剔除掉某一个小结点）
-        deleteComponent(curComponentId!)
-        setCurComponentId(null!)
+        deleteComponent(componentId)
+        setCurComponentId(null)
     }
 
     // 如果 portal 元素不存在，不渲染任何内容
@@ -220,6 +222,7 @@ export default function SelectedMask({ containerClassName, portalWrapperClassNam
                     zIndex: 15,
                     display: (!position.width || position.width < 10) ? "none" : "inline",
                     transform: 'translate(-100%, -100%)',
+                    pointerEvents: 'auto',
                 }}
             >
                 <Space>
@@ -235,15 +238,19 @@ export default function SelectedMask({ containerClassName, portalWrapperClassNam
                     >
                         {curComponent?.desc}
                     </div>
-                    {curComponentId !== 1 && (
-                        <div style={{ padding: '0 8px', backgroundColor: 'blue' }}>
+                    {componentId !== 1 && (
+                        <div
+                            data-delete-button="true"
+                            style={{ padding: '0 8px', backgroundColor: 'blue', pointerEvents: 'auto' }}
+                            onClick={(e) => e.stopPropagation()}
+                        >
                             <Popconfirm
                                 title="确认删除？"
                                 okText={'确认'}
                                 cancelText={'取消'}
                                 onConfirm={handleDelete}
                             >
-                                <DeleteOutlined style={{ color: '#fff' }} />
+                                <DeleteOutlined style={{ color: '#fff', cursor: 'pointer' }} />
                             </Popconfirm>
                         </div>
                     )}

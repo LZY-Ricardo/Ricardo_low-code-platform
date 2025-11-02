@@ -24,7 +24,7 @@ export interface Action {
     addComponent: (component: any, parentId?: number) => void;
     deleteComponent: (componentId: number) => void;
     updateComponentProps: (componentId: number, props: any) => void;  // 更新组件属性
-    setCurComponentId: (componentId: number) => void;
+    setCurComponentId: (componentId: number | null) => void;
     updateComponentStyles: (componentId: number, styles: CSSProperties) => void;
     updateComponentEvents: (componentId: number, events: Record<string, ComponentEvent>) => void;  // 更新组件事件
     setMode: (mode: 'edit' | 'preview') => void;
@@ -71,13 +71,19 @@ export const useComponentsStore = create<State & Action>(
             if (!componentId) return
             // 找到组件
             const component = getComponentById(componentId, get().components)
-            if (component?.parentId) { // 有父级
+            if (!component) return
+
+            if (component.parentId) { // 有父级，从父级的 children 中删除
                 const parentComponent = getComponentById(component.parentId, get().components)
-                if (parentComponent) {
-                    parentComponent.children = parentComponent.children?.filter((item) => item.id !== componentId)
+                if (parentComponent && parentComponent.children) {
+                    parentComponent.children = parentComponent.children.filter((item) => item.id !== componentId)
+                    set({
+                        components: [...get().components]
+                    })
                 }
+            } else { // 没有父级，从顶级组件数组中删除
                 set({
-                    components: [...get().components]
+                    components: get().components.filter((item) => item.id !== componentId)
                 })
             }
         },

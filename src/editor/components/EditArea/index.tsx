@@ -47,6 +47,12 @@ export default function EditArea() {
 
     // 借助冒泡机制，点击页面上的任何组件，点击行为都会冒泡到这里
     const handleClick: React.MouseEventHandler = (e) => {
+        // 检查是否点击了删除按钮或 Popconfirm
+        const target = e.target as HTMLElement
+        if (target.closest('.ant-popconfirm') || target.closest('[data-delete-button]')) {
+            return // 如果点击的是删除相关元素，不处理选择逻辑
+        }
+
         // console.log(e.nativeEvent.composedPath());
         const path = e.nativeEvent.composedPath()
         for (let i = 0; i < path.length; i++) {
