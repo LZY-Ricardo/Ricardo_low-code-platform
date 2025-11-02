@@ -40,7 +40,7 @@ export default function SelectedMask({ containerClassName, portalWrapperClassNam
         const { top: containerTop, left: containerLeft } = container.getBoundingClientRect()
 
         let labelTop = top - containerTop + container.scrollTop
-        const labelLeft = left - containerLeft + width
+        const labelLeft = left - containerLeft + width + container.scrollLeft
 
         if (labelTop <= 0) {
             labelTop -= -20
@@ -48,7 +48,7 @@ export default function SelectedMask({ containerClassName, portalWrapperClassNam
 
         setPosition({
             top: top - containerTop + container.scrollTop,
-            left: left - containerLeft + container.scrollTop,
+            left: left - containerLeft + container.scrollLeft,
             width,
             height,
             labelTop,
@@ -156,6 +156,28 @@ export default function SelectedMask({ containerClassName, portalWrapperClassNam
             window.removeEventListener('resize', resizeHandler)
         }
     }, [updatePosition])
+
+    // 监听容器滚动事件，确保滚动时遮罩层位置正确
+    useEffect(() => {
+        if (!componentId) {
+            return
+        }
+
+        const container = document.querySelector(`.${containerClassName}`)
+        if (!container) {
+            return
+        }
+
+        const scrollHandler = () => {
+            updatePosition()
+        }
+
+        container.addEventListener('scroll', scrollHandler, { passive: true })
+
+        return () => {
+            container.removeEventListener('scroll', scrollHandler)
+        }
+    }, [componentId, containerClassName, updatePosition])
 
     const curComponent = useMemo(() => {  // 找到被点击的组件对象
         return getComponentById(componentId, components)

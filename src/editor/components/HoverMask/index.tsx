@@ -38,11 +38,11 @@ export default function HoverMask({ containerClassName, componentId, portalWrapp
 
         setPosition({
             top: top - containerTop + container.scrollTop,
-            left: left - containerLeft + container.scrollTop,
+            left: left - containerLeft + container.scrollLeft,
             width,
             height,
             labelTop: top - containerTop + container.scrollTop,
-            labelLeft: left - containerLeft + width,
+            labelLeft: left - containerLeft + width + container.scrollLeft,
         })
     }, [componentId, containerClassName])
 
@@ -87,6 +87,28 @@ export default function HoverMask({ containerClassName, componentId, portalWrapp
     useEffect(() => {
         updatePosition()
     }, [componentId, portalElement, updatePosition])
+
+    // 监听容器滚动事件，确保滚动时遮罩层位置正确
+    useEffect(() => {
+        if (!componentId) {
+            return
+        }
+
+        const container = document.querySelector(`.${containerClassName}`)
+        if (!container) {
+            return
+        }
+
+        const scrollHandler = () => {
+            updatePosition()
+        }
+
+        container.addEventListener('scroll', scrollHandler, { passive: true })
+
+        return () => {
+            container.removeEventListener('scroll', scrollHandler)
+        }
+    }, [componentId, containerClassName, updatePosition])
 
     const curComponent = useMemo(() => {
         return getComponentById(componentId, components)
