@@ -15,7 +15,7 @@ export default function Outline() {
     // const treeData: TreeDataNode[] = components.map(renderTreeNode)
 
     return (
-        <div>
+        <div className='text-text-primary'>
             <Tree
                 defaultExpandAll
                 switcherIcon={<DownOutlined />}
@@ -26,6 +26,7 @@ export default function Outline() {
                     console.log(selectedKey, info)
                     setCurComponentId(Number(selectedKey))
                 }}
+                className='text-sm'
             />
         </div>
     )

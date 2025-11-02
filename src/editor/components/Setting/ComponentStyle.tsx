@@ -24,7 +24,7 @@ export default function ComponentStyle() {
         if (curComponent?.styles) {
             setCss(toCSSStr(curComponent.styles as Record<string, unknown>))
         }
-    }, [curComponent])
+    }, [curComponent, form])
 
     function toCSSStr(css: Record<string, unknown>) {
         let str = `.comp {\n`;
@@ -97,7 +97,7 @@ export default function ComponentStyle() {
                     </Form.Item>
                 ))
             }
-            <div className='h-[200px] border-[1px] border-[#ccc] relative overflow-hidden'>
+            <div className='h-[200px] border border-border-light rounded-lg relative overflow-hidden shadow-soft'>
                 <CssEditor value={css} onChange={handleEditorChange} />
             </div>
         </Form>

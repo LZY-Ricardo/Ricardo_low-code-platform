@@ -19,8 +19,10 @@ export default function Preview() {
     }
 
     return (
-        <div>
-            {renderComponents(components)}
+        <div className='h-full overflow-auto scrollbar-thin bg-bg-primary'>
+            <div className='min-h-full p-6'>
+                {renderComponents(components)}
+            </div>
         </div>
     )
 }

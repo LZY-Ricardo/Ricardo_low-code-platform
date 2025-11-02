@@ -16,7 +16,11 @@ export default function ComponentAttr() {
     }, [curComponent, form])
 
     if (!curComponent || !curComponentId) {
-        return null
+        return (
+            <div className="text-center text-text-secondary py-8">
+                请先选择一个组件
+            </div>
+        )
     }
 
     function renderFormElement(setter: ComponentSetter) {

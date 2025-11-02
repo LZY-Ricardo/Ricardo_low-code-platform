@@ -98,7 +98,7 @@ export default function ComponentEvent() {
 
     if (!curComponent || !curComponentId) {
         return (
-            <div className="text-center text-gray-400 py-8">
+            <div className="text-center text-text-secondary py-8">
                 请先选择一个组件
             </div>
         )
@@ -106,7 +106,7 @@ export default function ComponentEvent() {
 
     if (availableEvents.length === 0) {
         return (
-            <div className="text-center text-gray-400 py-8">
+            <div className="text-center text-text-secondary py-8">
                 该组件暂不支持事件配置
             </div>
         )
@@ -351,7 +351,7 @@ export default function ComponentEvent() {
 
     return (
         <div className="space-y-4">
-            <Text type="secondary" className="text-sm">
+            <Text type="secondary" className="text-sm text-text-secondary">
                 为组件配置事件处理，当用户交互时触发相应的动作
             </Text>
 

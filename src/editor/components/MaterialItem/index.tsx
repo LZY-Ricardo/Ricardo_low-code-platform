@@ -17,15 +17,23 @@ export default function MaterialItem(props: MaterialItemProps) {
       ref={dragRef as any}
       className='
         border-dashed
-        border-[1px]
-        border-[#000]
-        py-[8px]
-        px-[10px]
+        border-2
+        border-border-light
+        rounded-lg
+        py-3
+        px-4
         inline-block
-        bg-white
-        m-[10px]
+        bg-bg-secondary
+        m-2
         cursor-move
-        hover:bg-[#ccc]
+        transition-all
+        duration-200
+        hover:border-accent
+        hover:bg-accent/5
+        hover:shadow-soft
+        active:scale-95
+        text-text-primary
+        font-medium
       '
     >
       {props.name}

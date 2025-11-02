@@ -9,10 +9,16 @@ export default function Setting() {
 
     return (
         <div className="h-full flex flex-col">
-            <div className="flex-shrink-0">
-                <Segmented value={key} options={['属性', '外观', '事件']} block onChange={setKey} />
+            <div className="flex-shrink-0 p-4 border-b border-border-light bg-bg-secondary">
+                <Segmented 
+                    value={key} 
+                    options={['属性', '外观', '事件']} 
+                    block 
+                    onChange={setKey}
+                    className='shadow-soft'
+                />
             </div>
-            <div className='pt-[20px] flex-1 overflow-y-auto'>
+            <div className='flex-1 overflow-y-auto p-4 scrollbar-thin'>
                 {
                     key === '属性' && <ComponentAttr />
                 }

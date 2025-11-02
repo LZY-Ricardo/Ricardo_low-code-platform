@@ -61,13 +61,14 @@ export default function EditArea() {
   }
 
   return (
-    <div className='h-[100%] edit-area' 
+    <div className='h-[100%] edit-area overflow-auto scrollbar-thin' 
       onMouseOver={handleMouseOver} 
       onMouseLeave={() => setHoverComponentId(undefined)}
       onClick={handleClick}
     >
-      
-      {renderComponents(components)}
+      <div className='min-h-full p-6'>
+        {renderComponents(components)}
+      </div>
       {hoverComponentId && hoverComponentId !== curComponentId && (
         <HoverMask 
           componentId={hoverComponentId} 
