@@ -28,6 +28,8 @@ export interface ComponentConfig {
     defaultProps: Record<string, any>;
     // component: any;
     desc: string;
+    /** 是否允许包含子节点（容器型组件） */
+    allowChildren?: boolean;
     setter?: ComponentSetter[];
     stylesSetter?: ComponentSetter[];
     dev: any, // 开发模式下的组件
@@ -52,6 +54,7 @@ export const useComponentConfigStore = create<State & Action>(
                 desc: '容器',
                 dev: ContainerDev,
                 prod: ContainerProd,
+                allowChildren: true,
             },
             Button: {
                 name: 'Button',
@@ -103,6 +106,7 @@ export const useComponentConfigStore = create<State & Action>(
                 desc: '页面',
                 dev: PageDev,
                 prod: PageProd,
+                allowChildren: true,
             },
             Text: {
                 name: 'Text',
@@ -270,6 +274,7 @@ export const useComponentConfigStore = create<State & Action>(
                 desc: '卡片',
                 dev: CardDev,
                 prod: CardProd,
+                allowChildren: true,
                 setter: [
                     {
                         name: 'title',

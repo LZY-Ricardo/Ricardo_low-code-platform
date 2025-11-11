@@ -16,19 +16,23 @@ export default function EditArea() {
             if (!config?.dev) { // 没有对应的组件，比如：'Page'
                 return null
             }
-            // 渲染组件
-            return React.createElement(
-                config.dev,
-                {
-                    key: component.id,
-                    id: component.id,
-                    name: component.name,
-                    styles: component.styles,
-                    ...config.defaultProps,
-                    ...component.props
-                },
-                renderComponents(component.children || [])  // 递归渲染整个 json 树
-            )
+            // 渲染组件（仅当允许包含子节点时才传 children）
+            const elementProps = {
+                key: component.id,
+                id: component.id,
+                name: component.name,
+                styles: component.styles,
+                ...config.defaultProps,
+                ...component.props
+            }
+            if (config.allowChildren && (component.children?.length || 0) > 0) {
+                return React.createElement(
+                    config.dev,
+                    elementProps,
+                    renderComponents(component.children || [])  // 递归渲染整个 json 树
+                )
+            }
+            return React.createElement(config.dev, elementProps)
         })
     }
 

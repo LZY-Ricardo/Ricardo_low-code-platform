@@ -36,25 +36,31 @@ export default function ComponentWithEvents({ component, renderChildren }: Compo
 
     // 使用 React.createElement 动态创建组件
     // 将事件处理器绑定到组件 props 中
-    return React.createElement(
-        config.prod,
-        {
-            key: component.id,
-            id: component.id,
-            name: component.name,
-            styles: component.styles,
-            ...config.defaultProps,      // 默认属性
-            ...component.props,          // 组件自定义属性
-            // 绑定事件处理器，当事件触发时会执行配置的动作
-            onClick: eventHandlers.onClick,
-            onDoubleClick: eventHandlers.onDoubleClick,
-            onChange: eventHandlers.onChange,
-            onFocus: eventHandlers.onFocus,
-            onBlur: eventHandlers.onBlur,
-            onMouseEnter: eventHandlers.onMouseEnter,
-            onMouseLeave: eventHandlers.onMouseLeave,
-        },
-        renderChildren(component.children || [])  // 递归渲染子组件
-    )
+    const elementProps = {
+        key: component.id,
+        id: component.id,
+        name: component.name,
+        styles: component.styles,
+        ...config.defaultProps,      // 默认属性
+        ...component.props,          // 组件自定义属性
+        // 绑定事件处理器，当事件触发时会执行配置的动作
+        onClick: eventHandlers.onClick,
+        onDoubleClick: eventHandlers.onDoubleClick,
+        onChange: eventHandlers.onChange,
+        onFocus: eventHandlers.onFocus,
+        onBlur: eventHandlers.onBlur,
+        onMouseEnter: eventHandlers.onMouseEnter,
+        onMouseLeave: eventHandlers.onMouseLeave,
+    }
+
+    // 仅当组件允许包含子节点时，才传入 children
+    if (config.allowChildren && (component.children?.length || 0) > 0) {
+        return React.createElement(
+            config.prod,
+            elementProps,
+            renderChildren(component.children || [])
+        )
+    }
+    return React.createElement(config.prod, elementProps)
 }
 
