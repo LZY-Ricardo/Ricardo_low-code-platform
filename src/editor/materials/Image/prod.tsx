@@ -24,7 +24,7 @@ function extractImageUrl(url: string): string {
     }
 }
 
-export default function Image({ src, alt, width, height, styles, onClick, onDoubleClick, onMouseEnter, onMouseLeave, ...rest }: CommonComponentProps) {
+export default function Image({ id, src, alt, width, height, styles, onClick, onDoubleClick, onMouseEnter, onMouseLeave, ...rest }: CommonComponentProps) {
     // 处理空值
     const rawSrc = (src === undefined || src === null || src === '')
         ? 'https://via.placeholder.com/300x200'
@@ -35,6 +35,7 @@ export default function Image({ src, alt, width, height, styles, onClick, onDoub
 
     return (
         <AntdImage
+            id={id !== undefined && id !== null ? String(id) : undefined}
             src={imageSrc}
             alt={alt || '图片'}
             width={width || 200}
