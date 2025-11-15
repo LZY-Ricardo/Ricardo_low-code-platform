@@ -1,6 +1,7 @@
 import { Allotment } from "allotment";
 import "allotment/dist/style.css";
 import { useEffect, useRef } from 'react'
+import { useParams } from 'react-router-dom'
 import Header from './components/Header'
 import MaterialWrapper from './components/MaterialWrapper'
 import EditArea from './components/EditArea'
@@ -10,13 +11,21 @@ import { useComponentsStore } from './stores/components'
 import { useProjectStore } from './stores/project'
 
 export default function LowcodeEditor() {
+  const { projectId } = useParams<{ projectId?: string }>()
   const { mode, components, setComponents } = useComponentsStore()
-  const { loadProjects, currentProject, saveCurrentProject } = useProjectStore()
+  const { loadProjects, currentProject, saveCurrentProject, switchProject } = useProjectStore()
   const saveTimerRef = useRef<number | null>(null)
 
   useEffect(() => {
     loadProjects()
   }, [loadProjects])
+
+  // 当 URL 中的 projectId 改变时，切换到对应项目
+  useEffect(() => {
+    if (projectId && currentProject?.id !== projectId) {
+      switchProject(projectId)
+    }
+  }, [projectId, currentProject?.id, switchProject])
 
   useEffect(() => {
     if (currentProject?.components) {
