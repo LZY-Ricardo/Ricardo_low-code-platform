@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalStorage 容量测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .controls {
+            margin: 20px 0;
+        }
+        button {
+            background: #1890ff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #40a9ff;
+        }
+        button.danger {
+            background: #ff4d4f;
+        }
+        button.danger:hover {
+            background: #ff7875;
+        }
+        .status {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .progress {
+            background: #e6f7ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .error {
+            background: #fff1f0;
+            border: 1px solid #ffccc7;
+            color: #cf1322;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .success {
+            background: #f6ffed;
+            border: 1px solid #b7eb8f;
+            color: #389e0d;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📦 LocalStorage 容量测试工具</h1>
+        
+        <div class="controls">
+            <button onclick="testStorageLimit()">测试存储极限</button>
+            <button onclick="testProjectSave()">测试项目保存</button>
+            <button onclick="checkCurrentUsage()">查看当前使用量</button>
+            <button class="danger" onclick="clearAllData()">清空所有数据</button>
+        </div>
+
+        <div id="output"></div>
+    </div>
+
+    <script>
+        const output = document.getElementById('output');
+
+        function log(message, type = 'status') {
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = message;
+            output.appendChild(div);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        function getCurrentStorageSize() {
+            let total = 0;
+            for (let key in localStorage) {
+                if (localStorage.hasOwnProperty(key)) {
+                    total += localStorage[key].length + key.length;
+                }
+            }
+            return total * 2; // UTF-16 编码，每个字符2字节
+        }
+
+        function checkCurrentUsage() {
+            output.innerHTML = '';
+            const size = getCurrentStorageSize();
+            const itemCount = localStorage.length;
+            
+            log(`📊 当前 LocalStorage 使用情况：\n` +
+                `- 条目数量: ${itemCount}\n` +
+                `- 使用空间: ${formatBytes(size)}\n` +
+                `- 预估剩余: ${formatBytes(10 * 1024 * 1024 - size)} (假设限制为10MB)`, 'progress');
+            
+            if (itemCount > 0) {
+                log('\n存储的键值：', 'status');
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    const value = localStorage.getItem(key);
+                    const size = (key.length + value.length) * 2;
+                    log(`  ${key}: ${formatBytes(size)}`, 'status');
+                }
+            }
+        }
+
+        function testStorageLimit() {
+            output.innerHTML = '';
+            log('🚀 开始测试 LocalStorage 容量极限...', 'progress');
+            
+            const testKey = 'storage_limit_test_';
+            let chunkSize = 100 * 1024; // 每次写入100KB
+            let totalWritten = 0;
+            let chunkIndex = 0;
+            
+            try {
+                while (true) {
+                    const data = 'x'.repeat(chunkSize);
+                    const key = testKey + chunkIndex;
+                    
+                    localStorage.setItem(key, data);
+                    totalWritten += chunkSize * 2;
+                    chunkIndex++;
+                    
+                    if (chunkIndex % 10 === 0) {
+                        log(`已写入: ${formatBytes(totalWritten)}`, 'progress');
+                    }
+                }
+            } catch (error) {
+                if (error.name === 'QuotaExceededError' || error.code === 22) {
+                    log(`\n❌ 触发存储限制！`, 'error');
+                    log(`错误类型: ${error.name}`, 'error');
+                    log(`错误信息: ${error.message}`, 'error');
+                    log(`\n最终写入数据量: ${formatBytes(totalWritten)}`, 'success');
+                    
+                    // 清理测试数据
+                    for (let i = 0; i < chunkIndex; i++) {
+                        localStorage.removeItem(testKey + i);
+                    }
+                    log('\n✅ 已清理测试数据', 'success');
+                } else {
+                    log(`\n❌ 未知错误: ${error.name} - ${error.message}`, 'error');
+                }
+            }
+        }
+
+        function testProjectSave() {
+            output.innerHTML = '';
+            log('🧪 模拟项目保存测试...', 'progress');
+            
+            // 创建一个大型项目
+            const largeProject = {
+                id: Date.now() + '_test',
+                name: '测试超大项目',
+                components: [],
+                createdAt: Date.now(),
+                updatedAt: Date.now()
+            };
+            
+            // 添加大量组件
+            for (let i = 0; i < 1000; i++) {
+                largeProject.components.push({
+                    id: i,
+                    name: 'Container',
+                    props: {
+                        style: { 
+                            width: '100%', 
+                            height: '200px',
+                            background: 'linear-gradient(to right, #ff0000, #00ff00)',
+                            padding: '20px',
+                            margin: '10px'
+                        },
+                        text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '.repeat(10)
+                    },
+                    desc: '容器组件',
+                    children: Array(5).fill(null).map((_, j) => ({
+                        id: i * 1000 + j,
+                        name: 'Button',
+                        props: { text: `按钮 ${i}-${j}` },
+                        desc: '按钮'
+                    }))
+                });
+            }
+            
+            const projectJson = JSON.stringify(largeProject);
+            const projectSize = projectJson.length * 2;
+            
+            log(`项目组件数量: ${largeProject.components.length}`, 'status');
+            log(`项目JSON大小: ${formatBytes(projectSize)}`, 'status');
+            
+            try {
+                const startUsage = getCurrentStorageSize();
+                localStorage.setItem('lowcode_test_project', projectJson);
+                const endUsage = getCurrentStorageSize();
+                
+                log(`\n✅ 项目保存成功！`, 'success');
+                log(`存储前: ${formatBytes(startUsage)}`, 'success');
+                log(`存储后: ${formatBytes(endUsage)}`, 'success');
+                log(`增加量: ${formatBytes(endUsage - startUsage)}`, 'success');
+                
+                // 测试能否读取
+                const loaded = JSON.parse(localStorage.getItem('lowcode_test_project'));
+                log(`\n✅ 项目读取成功！组件数: ${loaded.components.length}`, 'success');
+                
+                // 清理
+                localStorage.removeItem('lowcode_test_project');
+                log(`✅ 已清理测试项目`, 'success');
+                
+            } catch (error) {
+                if (error.name === 'QuotaExceededError' || error.code === 22) {
+                    log(`\n❌ 存储空间不足！`, 'error');
+                    log(`项目大小: ${formatBytes(projectSize)}`, 'error');
+                    log(`当前使用: ${formatBytes(getCurrentStorageSize())}`, 'error');
+                    log(`\n💡 建议：`, 'progress');
+                    log(`1. 删除一些旧项目释放空间`, 'progress');
+                    log(`2. 使用导出功能备份项目`, 'progress');
+                    log(`3. 考虑升级到后端存储方案`, 'progress');
+                } else {
+                    log(`\n❌ 错误: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('确定要清空所有 LocalStorage 数据吗？')) {
+                const beforeSize = getCurrentStorageSize();
+                localStorage.clear();
+                output.innerHTML = '';
+                log(`✅ 已清空所有数据`, 'success');
+                log(`释放空间: ${formatBytes(beforeSize)}`, 'success');
+            }
+        }
+
+        // 页面加载时显示当前使用情况
+        checkCurrentUsage();
+    </script>
+</body>
+</html>
