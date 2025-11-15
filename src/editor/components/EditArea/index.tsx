@@ -77,7 +77,7 @@ export default function EditArea() {
             onClick={handleClick}
         >
             <div className='min-h-full p-6'>
-                {renderComponents(components)}
+                {components && renderComponents(components)}
             </div>
             {hoverComponentId && hoverComponentId !== curComponentId && (
                 <HoverMask

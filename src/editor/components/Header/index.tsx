@@ -1,11 +1,13 @@
 import { Space, Button, Dropdown, Modal, Input, message } from 'antd'
-import { SaveOutlined, FolderOpenOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import { SaveOutlined, FolderOpenOutlined, PlusOutlined, EditOutlined, DeleteOutlined, LeftOutlined } from '@ant-design/icons'
 import { useComponentsStore } from '../../stores/components'
 import { useProjectStore } from '../../stores/project'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import type { MenuProps } from 'antd'
 
 export default function Header() {
+  const navigate = useNavigate()
   const { mode, setMode, components } = useComponentsStore()
   const { 
     currentProject, 
@@ -29,6 +31,11 @@ export default function Header() {
     } else {
       message.error('项目保存失败')
     }
+  }
+
+  const handleBackToProjects = () => {
+    saveCurrentProject(components)
+    navigate('/projects')
   }
 
   const handleNewProject = () => {
@@ -130,10 +137,22 @@ export default function Header() {
           <div className='w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-accent-hover flex items-center justify-center shadow-soft'>
             <span className='text-white text-sm font-bold'>低</span>
           </div>
-          <h1 className='text-lg font-semibold text-text-primary m-0'>低码编辑器</h1>
-          {currentProject && (
-            <span className='text-sm text-gray-500'>- {currentProject.name}</span>
-          )}
+          <div className='flex items-center gap-2'>
+            <Button 
+              type="text" 
+              icon={<LeftOutlined />}
+              onClick={handleBackToProjects}
+              className='text-gray-600 hover:text-accent'
+            >
+              我的项目
+            </Button>
+            {currentProject && (
+              <>
+                <span className='text-gray-400'>/</span>
+                <span className='text-base font-medium text-text-primary'>{currentProject.name}</span>
+              </>
+            )}
+          </div>
         </div>
         <Space>
           {mode === 'edit' && (

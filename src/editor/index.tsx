@@ -19,10 +19,10 @@ export default function LowcodeEditor() {
   }, [loadProjects])
 
   useEffect(() => {
-    if (currentProject) {
+    if (currentProject?.components) {
       setComponents(currentProject.components)
     }
-  }, [currentProject?.id])
+  }, [currentProject?.id, setComponents])
 
   useEffect(() => {
     if (saveTimerRef.current) {
