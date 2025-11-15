@@ -1,14 +1,47 @@
 import { Allotment } from "allotment";
 import "allotment/dist/style.css";
+import { useEffect, useRef } from 'react'
 import Header from './components/Header'
 import MaterialWrapper from './components/MaterialWrapper'
 import EditArea from './components/EditArea'
 import Setting from './components/Setting'
 import Preview from "./components/Preview";
 import { useComponentsStore } from './stores/components'
+import { useProjectStore } from './stores/project'
 
 export default function LowcodeEditor() {
-  const { mode } = useComponentsStore()
+  const { mode, components, setComponents } = useComponentsStore()
+  const { loadProjects, currentProject, saveCurrentProject } = useProjectStore()
+  const saveTimerRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    loadProjects()
+  }, [loadProjects])
+
+  useEffect(() => {
+    if (currentProject) {
+      setComponents(currentProject.components)
+    }
+  }, [currentProject?.id])
+
+  useEffect(() => {
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current)
+    }
+
+    saveTimerRef.current = window.setTimeout(() => {
+      if (currentProject) {
+        saveCurrentProject(components)
+      }
+    }, 3000)
+
+    return () => {
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current)
+      }
+    }
+  }, [components])
+
   return (
     <div className="h-[100vh] flex flex-col bg-bg-primary">
       <div className="h-[64px] flex items-center border-b border-border-light bg-bg-secondary shadow-soft">

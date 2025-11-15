@@ -23,11 +23,12 @@ export interface State {
 export interface Action {
     addComponent: (component: any, parentId?: number) => void;
     deleteComponent: (componentId: number) => void;
-    updateComponentProps: (componentId: number, props: any) => void;  // 更新组件属性
+    updateComponentProps: (componentId: number, props: any) => void;
     setCurComponentId: (componentId: number | null) => void;
     updateComponentStyles: (componentId: number, styles: CSSProperties) => void;
-    updateComponentEvents: (componentId: number, events: Record<string, ComponentEvent>) => void;  // 更新组件事件
+    updateComponentEvents: (componentId: number, events: Record<string, ComponentEvent>) => void;
     setMode: (mode: 'edit' | 'preview') => void;
+    setComponents: (components: Component[]) => void;
 }
 
 export const useComponentsStore = create<State & Action>(
@@ -172,6 +173,13 @@ export const useComponentsStore = create<State & Action>(
         setMode: (mode) => {
             set({
                 mode: mode
+            })
+        },
+        setComponents: (components) => {
+            set({
+                components: components,
+                curComponentId: null,
+                curComponent: null
             })
         }
     })
