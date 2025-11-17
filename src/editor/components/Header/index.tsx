@@ -1,10 +1,11 @@
 import { Space, Button, Dropdown, Modal, Input, message } from 'antd'
-import { SaveOutlined, FolderOpenOutlined, PlusOutlined, EditOutlined, DeleteOutlined, LeftOutlined } from '@ant-design/icons'
+import { SaveOutlined, FolderOpenOutlined, PlusOutlined, EditOutlined, DeleteOutlined, LeftOutlined, ExportOutlined } from '@ant-design/icons'
 import { useComponentsStore } from '../../stores/components'
 import { useProjectStore } from '../../stores/project'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { MenuProps } from 'antd'
+import ExportModal from '../ExportModal'
 
 export default function Header() {
   const navigate = useNavigate()
@@ -23,6 +24,7 @@ export default function Header() {
   const [renameModalVisible, setRenameModalVisible] = useState(false)
   const [newProjectName, setNewProjectName] = useState('')
   const [renamingProjectId, setRenamingProjectId] = useState<string | null>(null)
+  const [exportModalVisible, setExportModalVisible] = useState(false)
 
   const handleSave = () => {
     const success = saveCurrentProject(components)
@@ -169,7 +171,7 @@ export default function Header() {
               >
                 新建项目
               </Button>
-              <Dropdown 
+              <Dropdown
                 menu={{ items: projectMenuItems }}
                 trigger={['click']}
               >
@@ -177,8 +179,14 @@ export default function Header() {
                   项目列表 ({projects.length})
                 </Button>
               </Dropdown>
-              <Button 
-                type="primary" 
+              <Button
+                icon={<ExportOutlined />}
+                onClick={() => setExportModalVisible(true)}
+              >
+                导出
+              </Button>
+              <Button
+                type="primary"
                 onClick={() => setMode('preview')}
                 className='shadow-soft'
               >
@@ -217,6 +225,11 @@ export default function Header() {
           onPressEnter={handleRenameConfirm}
         />
       </Modal>
+
+      <ExportModal
+        visible={exportModalVisible}
+        onClose={() => setExportModalVisible(false)}
+      />
     </div>
   )
 }
