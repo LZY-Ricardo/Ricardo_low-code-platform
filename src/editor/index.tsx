@@ -2,6 +2,7 @@ import { Allotment } from "allotment";
 import "allotment/dist/style.css";
 import { useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
+import { message } from 'antd'
 import Header from './components/Header'
 import MaterialWrapper from './components/MaterialWrapper'
 import EditArea from './components/EditArea'
@@ -22,11 +23,19 @@ export default function LowcodeEditor() {
 
   // 当 URL 中的 projectId 改变时，切换到对应项目
   useEffect(() => {
-    if (projectId && currentProject?.id !== projectId) {
-      switchProject(projectId)
+    const handleSwitchProject = async () => {
+      if (projectId && currentProject?.id !== projectId) {
+        const project = await switchProject(projectId)
+        if (project) {
+          message.success(`已切换到项目：${project.name}`)
+        }
+      }
     }
+    handleSwitchProject()
   }, [projectId, currentProject?.id, switchProject])
 
+  // 当 currentProject 改变时，同步组件
+  // 注意：不要依赖 updatedAt，否则保存操作会触发组件重新加载导致闪烁
   useEffect(() => {
     if (currentProject?.components) {
       setComponents(currentProject.components)

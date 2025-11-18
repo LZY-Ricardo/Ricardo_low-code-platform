@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Modal, Button, message } from 'antd'
 import { ExportFormat, ExporterFactory, type ExportOptions } from '@/editor/utils/exporters'
 import { useComponentsStore } from '@/editor/stores/components'
@@ -18,15 +18,12 @@ export default function ExportModal({ visible, onClose }: ExportModalProps) {
   const { components } = useComponentsStore()
   const { currentProject } = useProjectStore()
 
-  // 默认项目名称
-  const defaultProjectName = currentProject?.name || 'lowcode-project'
-
   // 导出格式
   const [format, setFormat] = useState<ExportFormat>(ExportFormat.JSON)
 
   // 导出选项
   const [options, setOptions] = useState<ExportOptions>({
-    projectName: defaultProjectName,
+    projectName: currentProject?.name || 'lowcode-project',
     format: ExportFormat.JSON,
     includeComments: true,
     indentSize: 2,
@@ -37,6 +34,16 @@ export default function ExportModal({ visible, onClose }: ExportModalProps) {
 
   // 加载状态
   const [loading, setLoading] = useState(false)
+
+  // 当弹窗打开或当前项目变化时，同步更新项目名称
+  useEffect(() => {
+    if (visible && currentProject) {
+      setOptions(prev => ({
+        ...prev,
+        projectName: currentProject.name
+      }))
+    }
+  }, [visible, currentProject])
 
   // 更新选项
   const handleOptionsChange = (newOptions: Partial<ExportOptions>) => {
@@ -88,7 +95,7 @@ export default function ExportModal({ visible, onClose }: ExportModalProps) {
       setTimeout(() => {
         setFormat(ExportFormat.JSON)
         setOptions({
-          projectName: defaultProjectName,
+          projectName: currentProject?.name || 'lowcode-project',
           format: ExportFormat.JSON,
           includeComments: true,
           indentSize: 2,

@@ -36,25 +36,19 @@ export default function FormatSelector({ value, onChange }: FormatSelectorProps)
       value: ExportFormat.REACT,
       label: 'React 项目',
       icon: '⚛️',
-      description: '完整的 React + Vite 项目源码',
-      disabled: true,
-      badge: 'Phase 2'
+      description: '完整的 React + Vite 项目源码'
     },
     {
       value: ExportFormat.VUE,
       label: 'Vue 项目',
       icon: '💚',
-      description: '完整的 Vue 3 + Vite 项目源码',
-      disabled: true,
-      badge: 'Phase 2'
+      description: '完整的 Vue 3 + Vite 项目源码'
     },
     {
       value: ExportFormat.SNIPPET,
       label: '代码片段',
       icon: '📝',
-      description: 'JSX/Vue 组件代码，可复制使用',
-      disabled: true,
-      badge: 'Phase 3'
+      description: 'JSX/Vue 组件代码，可复制使用'
     }
   ]
 

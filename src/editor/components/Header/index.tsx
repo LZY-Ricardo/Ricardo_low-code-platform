@@ -14,20 +14,18 @@ export default function Header() {
     currentProject, 
     projects, 
     saveCurrentProject, 
-    switchProject, 
     createProject,
     renameProject,
     deleteProject
   } = useProjectStore()
-  const setComponents = useComponentsStore((state) => state.setComponents)
   
   const [renameModalVisible, setRenameModalVisible] = useState(false)
   const [newProjectName, setNewProjectName] = useState('')
   const [renamingProjectId, setRenamingProjectId] = useState<string | null>(null)
   const [exportModalVisible, setExportModalVisible] = useState(false)
 
-  const handleSave = () => {
-    const success = saveCurrentProject(components)
+  const handleSave = async () => {
+    const success = await saveCurrentProject(components)
     if (success) {
       message.success('项目保存成功')
     } else {
@@ -35,25 +33,31 @@ export default function Header() {
     }
   }
 
-  const handleBackToProjects = () => {
-    saveCurrentProject(components)
+  const handleBackToProjects = async () => {
+    await saveCurrentProject(components)
     navigate('/projects')
   }
 
-  const handleNewProject = () => {
-    saveCurrentProject(components)
-    const newProj = createProject()
-    setComponents(newProj.components)
-    message.success(`已创建项目：${newProj.name}`)
+  const handleNewProject = async () => {
+    await saveCurrentProject(components)
+    const newProj = await createProject()
+    if (newProj) {
+      // 导航到新项目的 URL
+      navigate(`/editor/${newProj.id}`)
+      message.success(`已创建项目：${newProj.name}`)
+    }
   }
 
-  const handleSwitchProject = (projectId: string) => {
-    saveCurrentProject(components)
-    const project = switchProject(projectId)
-    if (project) {
-      setComponents(project.components)
-      message.success(`已切换到项目：${project.name}`)
+  const handleSwitchProject = async (projectId: string) => {
+    // 如果切换到当前项目，不做任何操作
+    if (currentProject?.id === projectId) {
+      return
     }
+
+    await saveCurrentProject(components)
+    // 通过导航到新的 URL 来触发项目切换
+    // 实际的切换逻辑由 editor/index.tsx 的 useEffect 处理
+    navigate(`/editor/${projectId}`)
   }
 
   const handleRenameClick = (projectId: string, currentName: string) => {
@@ -62,13 +66,13 @@ export default function Header() {
     setRenameModalVisible(true)
   }
 
-  const handleRenameConfirm = () => {
+  const handleRenameConfirm = async () => {
     if (!renamingProjectId || !newProjectName.trim()) {
       message.warning('请输入项目名称')
       return
     }
-    
-    const success = renameProject(renamingProjectId, newProjectName.trim())
+
+    const success = await renameProject(renamingProjectId, newProjectName.trim())
     if (success) {
       message.success('重命名成功')
       setRenameModalVisible(false)
@@ -86,14 +90,19 @@ export default function Header() {
       okText: '删除',
       okType: 'danger',
       cancelText: '取消',
-      onOk: () => {
-        const success = deleteProject(projectId)
+      onOk: async () => {
+        const success = await deleteProject(projectId)
         if (success) {
-          const newCurrentProject = useProjectStore.getState().currentProject
-          if (newCurrentProject) {
-            setComponents(newCurrentProject.components)
-          }
           message.success('项目已删除')
+          // 如果删除的是当前项目，deleteProject 会自动切换到其他项目
+          // 需要导航到新的当前项目
+          const { currentProject: newCurrentProject } = useProjectStore.getState()
+          if (newCurrentProject) {
+            navigate(`/editor/${newCurrentProject.id}`)
+          } else {
+            // 如果没有项目了，返回项目列表
+            navigate('/projects')
+          }
         } else {
           message.error('删除失败')
         }
